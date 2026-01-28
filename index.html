@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Made With Love</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Montserrat', sans-serif; background: #eef2f3; color: #4a4a4a; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+        .ambient-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background: radial-gradient(at 0% 0%, hsla(340,82%,76%,0.4) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,80%,0.4) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,80%,0.4) 0, transparent 50%); backdrop-filter: blur(40px); }
+        .glass { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.7); border-radius: 20px; box-shadow: 0 4px 20px 0 rgba(31, 38, 135, 0.05); }
+        .glass-nav { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.5); }
+        .liquid-input { background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 14px; padding: 14px; width: 100%; outline: none; font-size: 16px; /* Prevent Zoom */ }
+        .liquid-input:focus { background: #fff; box-shadow: 0 0 0 3px rgba(255, 182, 193, 0.3); border-color: #ffb6c1; }
+        .btn-primary { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: white; font-weight: 700; border-radius: 14px; padding: 16px; border: none; width: 100%; font-size: 16px; }
+        .btn-primary:active { transform: scale(0.98); }
+        
+        /* Mobile Bottom Sheet Modal */
+        .modal-glass { 
+            background: rgba(255, 255, 255, 0.98); 
+            border-radius: 24px 24px 0 0; 
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15); 
+            max-height: 90vh; 
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            transition: transform 0.3s ease-out;
+        }
+        @media (min-width: 768px) {
+            .modal-glass { border-radius: 32px; width: auto; position: relative; bottom: auto; max-width: 42rem; }
+        }
+        
+        .section-title { font-weight: 800; color: #ff9a9e; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; margin-bottom: 8px; margin-top: 16px; border-bottom: 2px solid #ffeff0; padding-bottom: 4px; }
+    </style>
+</head>
+<body class="pb-24">
+    <div class="ambient-bg"></div>
+
+    <nav class="glass-nav fixed top-0 w-full z-50 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2"><img src="logo.png" class="h-10 w-auto drop-shadow-sm" alt="Logo"></div>
+            <div class="flex gap-2">
+                <button onclick="switchTab('home')" id="nav-home" class="px-4 py-2 rounded-full text-xs font-bold bg-white shadow-sm text-gray-700">Shop</button>
+                <button onclick="switchTab('track')" id="nav-track" class="px-4 py-2 rounded-full text-xs font-bold text-gray-400">Track</button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="home-section" class="max-w-6xl mx-auto px-4 pt-24 pb-10">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-extrabold text-gray-800 tracking-tight mb-2">Sweet Creations</h1>
+            <p class="text-gray-500 text-sm">Handcrafted with passion</p>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="new-arrivals-grid">
+            <div class="col-span-full py-20 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin text-2xl mb-4"></i><p class="text-sm">Loading...</p></div>
+        </div>
+    </div>
+
+    <div id="track-section" class="hidden max-w-md mx-auto px-4 pt-32 text-center">
+        <div class="glass p-8">
+            <i class="fa-solid fa-box-open text-4xl text-gray-300 mb-4"></i>
+            <h2 class="text-xl font-bold mb-2">Track Order</h2>
+            <p class="text-gray-400 text-xs mb-6">Enter your Order ID</p>
+            <input type="text" id="trackInput" placeholder="Order ID" class="liquid-input mb-4 text-center">
+            <button onclick="track()" class="btn-primary">CHECK STATUS</button>
+            <div id="trackResult" class="hidden mt-6 p-4 bg-white/50 rounded-xl text-left border border-white text-sm"></div>
+        </div>
+    </div>
+
+    <div id="customModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-[60] flex items-end md:items-center justify-center">
+        <div class="modal-glass p-6 md:p-8 animate-slide-up">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center z-10"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div class="flex gap-4 mb-4 items-center">
+                <img id="modalImg" src="" class="w-20 h-20 object-cover rounded-xl shadow-sm bg-white">
+                <div>
+                    <span class="text-[10px] font-bold text-pink-400 uppercase tracking-widest block" id="modalCode">CODE</span>
+                    <h3 id="modalCaption" class="text-lg font-bold text-gray-800 leading-tight">Product</h3>
+                    <span class="text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-500 mt-1 inline-block" id="modalCategory">Category</span>
+                </div>
+            </div>
+
+            <div id="dynamicOptions" class="grid grid-cols-2 gap-3 mb-4"></div>
+
+            <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-100 mb-4">
+                <div class="text-[10px] font-bold text-blue-600 mb-2 uppercase tracking-wide">Delivery Calculation</div>
+                <div class="flex gap-2">
+                    <select id="selPrefecture" onchange="calculateModalTotal()" class="liquid-input text-sm flex-1 py-2">
+                        <option value="">Select Prefecture</option>
+                    </select>
+                    <div class="bg-white rounded-xl px-3 py-2 flex items-center font-bold text-blue-600 text-sm w-20 justify-center shadow-sm border border-blue-100">¥<span id="shippingFeeDisplay">0</span></div>
+                </div>
+            </div>
+
+            <h4 class="section-title"><i class="fa-solid fa-user-pen mr-1"></i> Sender Info (ပို့သူ)</h4>
+            <div class="grid grid-cols-1 gap-3">
+                <input type="text" id="senderName" placeholder="Name (အမည်)" class="liquid-input">
+                <input type="tel" id="senderPhone" placeholder="Phone (ဖုန်း)" class="liquid-input">
+            </div>
+
+            <h4 class="section-title"><i class="fa-solid fa-gift mr-1"></i> Receiver Info (လက်ခံသူ)</h4>
+            <div class="grid grid-cols-1 gap-3">
+                <input type="text" id="receiverName" placeholder="Name (အမည်)" class="liquid-input">
+                <input type="tel" id="receiverPhone" placeholder="Phone (ဖုန်း)" class="liquid-input">
+                <textarea id="fullAddress" placeholder="Address (လိပ်စာအပြည့်အစုံ)" rows="2" class="liquid-input"></textarea>
+            </div>
+
+            <h4 class="section-title"><i class="fa-regular fa-calendar-check mr-1"></i> Delivery Details</h4>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <input type="date" id="deliveryDate" class="liquid-input text-sm">
+                <select id="deliveryTime" class="liquid-input text-sm">
+                    <option value="Any">Any Time</option>
+                    <option value="8:00–12:00">8:00–12:00</option>
+                    <option value="14:00–16:00">14:00–16:00</option>
+                    <option value="16:00–18:00">16:00–18:00</option>
+                    <option value="18:00–20:00">18:00–20:00</option>
+                    <option value="19:00–21:00">19:00–21:00</option>
+                </select>
+            </div>
+            <textarea id="cardMessage" placeholder="Message Card (ကိတ်ပေါ်ရေးမည့်စာ)" class="liquid-input mb-2" rows="1"></textarea>
+            <div class="text-[10px] text-red-400 bg-red-50 p-2 rounded-lg leading-tight border border-red-100">
+                ⚠️ လိပ်စာမှားခြင်း၊ အခန်းနံပါတ် မပြည့်စုံပါက လိုချင်သောနေ့တွင် မရောက်နိုင်ပါ။
+            </div>
+
+            <h4 class="section-title"><i class="fa-solid fa-receipt mr-1"></i> Payment Proof</h4>
+            <div class="relative group mb-6">
+                <input type="file" id="receiptImg" class="hidden" onchange="document.getElementById('receiptLabel').innerHTML = '<i class=\'fa-solid fa-check text-green-500 mr-2\'></i> Ready to Upload'">
+                <label for="receiptImg" id="receiptLabel" class="liquid-input border-dashed border-2 text-center block py-3 text-gray-400 text-sm cursor-pointer active:bg-gray-50">
+                    <i class="fa-solid fa-upload mr-1"></i> Upload Slip
+                </label>
+            </div>
+
+            <div class="sticky bottom-0 bg-white/95 backdrop-blur-md pt-2 pb-4 border-t border-gray-100 -mx-6 px-6 -mb-6">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="text-xs text-gray-400 font-bold uppercase">Total Amount</div>
+                    <div class="text-2xl font-extrabold text-pink-600">¥<span id="modalTotal">0</span></div>
+                </div>
+                <button onclick="submitCustomOrder()" id="submitBtn" class="btn-primary shadow-lg shadow-pink-200">CONFIRM ORDER</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, doc, getDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const app = initializeApp({ apiKey: "AIzaSyD6txNwU9zsYWeDjrSTf25k20ZgZA0CBGc", authDomain: "made-with-love-by-me-2dee6.firebaseapp.com", projectId: "made-with-love-by-me-2dee6", appId: "1:100906722681:web:80dc4caec22a2dae91fba8" });
+        const db = getFirestore(app);
+        const IMGBB_API_KEY = "80b5e4d996c2c5e93df3349eea5c77f8"; 
+
+        const PRICES = { Cake: { sizes: {'12cm':3500,'16cm':4000,'18cm':5000,'20cm':6000,'25cm':8000}, creams: {'Vanilla':0,'Chocolate':500,'Coffee':500,'Cheese':1000,'Matcha':1000,'Durian':1500,'Fresh Strawberry':1000} }, 'Real Flower': { options: {'1 Stalk':1500,'3 Stalks':3500,'5 Stalks':5000,'10 Stalks':9000,'15 Stalks':13000,'Bouquet Only':5000} }, 'Dried Flower': { options: {'1 Stalk':700,'3 Stalks':1500,'5 Stalks':2500,'10 Stalks':4500,'15 Stalks':5500,'Bouquet Only':4000} } };
+        const PREF_ZONES = { 'Aichi':1,'Chiba':1,'Fukui':1,'Fukushima':1,'Gifu':1,'Gunma':1,'Hiroshima':3,'Hokkaido':4,'Hyogo':2,'Ibaraki':1,'Ishikawa':1,'Iwate':2,'Kagawa':3,'Kagoshima':4,'Kanagawa':1,'Kochi':3,'Kumamoto':4,'Kyoto':2,'Mie':1,'Miyagi':1,'Miyazaki':4,'Nagano':1,'Nagasaki':4,'Nara':2,'Niigata':1,'Oita':4,'Okayama':3,'Okinawa':5,'Osaka':2,'Saga':4,'Saitama':1,'Shiga':2,'Shimane':3,'Shizuoka':1,'Tochigi':1,'Tokushima':3,'Tokyo':1,'Tottori':3,'Toyama':1,'Wakayama':2,'Yamagata':1,'Yamaguchi':3,'Yamanashi':1,'Akita':2,'Aomori':2,'Ehime':3,'Fukuoka':4 };
+        const SHIPPING_RATES = { 1:{60:[940,1215],80:[1230,1560],100:[1530,1970]}, 2:{60:[1060,1335],80:[1350,1680],100:[1650,2090]}, 3:{60:[1190,1465],80:[1480,1810],100:[1790,2230]}, 4:{60:[1460,1735],80:[1740,2070],100:[2050,2490]}, 5:{60:[1460,1735],80:[2070,2345],100:[2710,3150]} };
+
+        let selectedProduct = null;
+        const prefSelect = document.getElementById('selPrefecture');
+        Object.keys(PREF_ZONES).sort().forEach(p => { const opt=document.createElement('option'); opt.value=p; opt.innerText=p; prefSelect.appendChild(opt); });
+
+        onSnapshot(query(collection(db, "products"), orderBy("createdAt", "desc")), snap => {
+            const grid = document.getElementById('new-arrivals-grid');
+            if(snap.empty) { grid.innerHTML = '<p class="col-span-full text-center text-gray-300">Coming Soon</p>'; return; }
+            grid.innerHTML = '';
+            snap.forEach(d => {
+                const i = d.data(); i.id = d.id;
+                const dCode = i.orderCode || "N/A";
+                const dName = i.caption || i.name || "Product";
+                grid.innerHTML += `
+                    <div class="glass overflow-hidden cursor-pointer group active:scale-95 transition" onclick='openModal(${JSON.stringify({...i, id:d.id})})'>
+                        <div class="aspect-square relative overflow-hidden bg-gray-100">
+                            <img src="${i.imageUrl}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-3">
+                            <div class="text-[10px] font-bold text-gray-400 mb-0.5 uppercase tracking-wider">${dCode}</div>
+                            <h3 class="font-bold text-gray-700 truncate text-sm leading-tight">${dName}</h3>
+                            <div class="mt-2 text-xs text-pink-400 font-bold flex items-center gap-1">Customize <i class="fa-solid fa-chevron-right text-[10px]"></i></div>
+                        </div>
+                    </div>`;
+            });
+        });
+
+        window.openModal = (product) => {
+            selectedProduct = product;
+            document.getElementById('modalImg').src = product.imageUrl;
+            document.getElementById('modalCaption').innerText = product.caption || product.name || "Product";
+            document.getElementById('modalCode').innerText = product.orderCode || "N/A";
+            document.getElementById('modalCategory').innerText = product.category;
+
+            const container = document.getElementById('dynamicOptions');
+            container.innerHTML = ''; 
+
+            if(product.category === 'Cake') {
+                let sizeHtml = `<div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Size</label><select id="selSize" onchange="calculateModalTotal()" class="liquid-input text-sm py-2 px-2">`;
+                for (const [size, price] of Object.entries(PRICES.Cake.sizes)) { sizeHtml += `<option value="${size}">${size} (¥${price})</option>`; }
+                sizeHtml += `</select></div>`;
+                let creamHtml = `<div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Cream</label><select id="selFlavor" onchange="calculateModalTotal()" class="liquid-input text-sm py-2 px-2">`;
+                for (const [flavor, price] of Object.entries(PRICES.Cake.creams)) { creamHtml += `<option value="${flavor}">${flavor} (${price > 0 ? '+¥'+price : 'Free'})</option>`; }
+                creamHtml += `</select></div>`;
+                container.innerHTML = sizeHtml + creamHtml;
+            } else {
+                let type = product.category;
+                if (!PRICES[type]) type = 'Dried Flower';
+                let flowerHtml = `<div class="col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Option</label><select id="selFlowerOpt" onchange="calculateModalTotal()" class="liquid-input text-sm py-2 px-2">`;
+                for (const [opt, price] of Object.entries(PRICES[type].options)) { flowerHtml += `<option value="${opt}">${opt} (¥${price})</option>`; }
+                flowerHtml += `</select></div>`;
+                container.innerHTML = flowerHtml;
+            }
+            calculateModalTotal();
+            document.getElementById('customModal').classList.remove('hidden');
+        };
+
+        window.calculateModalTotal = () => {
+            let itemTotal = 0;
+            if(selectedProduct.category === 'Cake') {
+                const s = document.getElementById('selSize').value;
+                const f = document.getElementById('selFlavor').value;
+                itemTotal = PRICES.Cake.sizes[s] + PRICES.Cake.creams[f];
+            } else {
+                let type = selectedProduct.category;
+                if (!PRICES[type]) type = 'Dried Flower';
+                const opt = document.getElementById('selFlowerOpt').value;
+                itemTotal = PRICES[type].options[opt];
+            }
+
+            let shippingFee = 0;
+            const prefecture = document.getElementById('selPrefecture').value;
+            const isCool = (selectedProduct.category === 'Cake' || selectedProduct.category === 'Real Flower');
+            // Safe fallback for size
+            const size = selectedProduct.shipSize || (isCool ? '80' : '60'); 
+            
+            if (prefecture) {
+                const zone = PREF_ZONES[prefecture] || 1;
+                const rateTable = SHIPPING_RATES[zone] || SHIPPING_RATES[1];
+                const rates = rateTable[size] || rateTable['80']; 
+                shippingFee = isCool ? rates[1] : rates[0];
+            }
+            document.getElementById('shippingFeeDisplay').innerText = shippingFee;
+            document.getElementById('modalTotal').innerText = itemTotal + shippingFee;
+        };
+
+        window.submitCustomOrder = async () => {
+            const senderName = document.getElementById('senderName').value;
+            const senderPhone = document.getElementById('senderPhone').value;
+            const receiverName = document.getElementById('receiverName').value;
+            const receiverPhone = document.getElementById('receiverPhone').value;
+            const fullAddr = document.getElementById('fullAddress').value;
+            const prefecture = document.getElementById('selPrefecture').value;
+            const file = document.getElementById('receiptImg').files[0];
+            
+            if(!senderName || !senderPhone || !receiverName || !fullAddr || !prefecture) return alert("Please fill info!");
+            if(!file) return alert("Please upload Slip!");
+
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ...'; btn.disabled = true;
+
+            try {
+                const formData = new FormData(); formData.append("image", file);
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
+                const data = await res.json();
+                
+                const total = parseInt(document.getElementById('modalTotal').innerText);
+                const deliFee = parseInt(document.getElementById('shippingFeeDisplay').innerText);
+                let details = selectedProduct.category === 'Cake' ? { size: document.getElementById('selSize').value, flavor: document.getElementById('selFlavor').value } : { flowerOption: document.getElementById('selFlowerOpt').value };
+
+                const finalCode = selectedProduct.orderCode || "N/A";
+                const finalCaption = selectedProduct.caption || selectedProduct.name || "Product";
+
+                const orderData = {
+                    category: selectedProduct.category, orderCode: finalCode, caption: finalCaption, imageUrl: selectedProduct.imageUrl, receiptUrl: data.data.url,
+                    ...details, deliveryFee: deliFee, totalPrice: total,
+                    sender: { name: senderName, phone: senderPhone },
+                    receiver: { name: receiverName, phone: receiverPhone },
+                    delivery: { prefecture: prefecture, address: fullAddr, date: document.getElementById('deliveryDate').value, time: document.getElementById('deliveryTime').value, message: document.getElementById('cardMessage').value },
+                    status: 'Pending', createdAt: new Date().toISOString()
+                };
+
+                await addDoc(collection(db, "orders"), orderData);
+                alert("Success!");
+                closeModal();
+            } catch(e) { alert("Error"); }
+            btn.innerText = "CONFIRM ORDER"; btn.disabled = false;
+        };
+
+        window.closeModal = () => document.getElementById('customModal').classList.add('hidden');
+        window.switchTab = t => { 
+            document.getElementById('home-section').classList.toggle('hidden', t !== 'home');
+            document.getElementById('track-section').classList.toggle('hidden', t !== 'track');
+        };
+        window.track = async () => {
+            const id = document.getElementById('trackInput').value.trim();
+            if(!id) return;
+            try {
+                const s = await getDoc(doc(db, "orders", id));
+                const r = document.getElementById('trackResult');
+                if(s.exists()) {
+                    const d = s.data();
+                    r.classList.remove('hidden');
+                    const title = d.caption || d.productName || "Order";
+                    r.innerHTML = `<div class="font-bold text-gray-800 mb-1 uppercase">${d.status}</div><div class="text-xs text-gray-500">${title}</div><div class="mt-1 font-bold text-lg">¥${d.totalPrice}</div>`;
+                } else alert("Invalid ID");
+            } catch(e) { alert("Error"); }
+        };
+    </script>
+</body>
+</html>
